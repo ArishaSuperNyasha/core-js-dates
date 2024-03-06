@@ -72,8 +72,11 @@ function getDayName(date) {
  * Date('2024-02-13T00:00:00Z') => Date('2024-02-16T00:00:00Z')
  * Date('2024-02-16T00:00:00Z') => Date('2024-02-23T00:00:00Z')
  */
-function getNextFriday(/* date */) {
-  throw new Error('Not implemented');
+function getNextFriday(date) {
+  let delta = 5 - date.getDay();
+  delta = delta < 1 ? delta + 7 : delta;
+  date.setDate(date.getDate() + delta);
+  return date;
 }
 
 /**
@@ -87,8 +90,8 @@ function getNextFriday(/* date */) {
  * 1, 2024 => 31
  * 2, 2024 => 29
  */
-function getCountDaysInMonth(/* month, year */) {
-  throw new Error('Not implemented');
+function getCountDaysInMonth(month, year) {
+  return new Date(year, month, 0).getDate();
 }
 
 /**
@@ -102,8 +105,9 @@ function getCountDaysInMonth(/* month, year */) {
  * '2024-02-01T00:00:00.000Z', '2024-02-02T00:00:00.000Z'  => 2
  * '2024-02-01T00:00:00.000Z', '2024-02-12T00:00:00.000Z'  => 12
  */
-function getCountDaysOnPeriod(/* dateStart, dateEnd */) {
-  throw new Error('Not implemented');
+function getCountDaysOnPeriod(dateStart, dateEnd) {
+  const [a, b] = [dateStart, dateEnd].map((i) => new Date(i));
+  return Math.abs(a - b) / 3600000 / 24 + 1;
 }
 
 /**
@@ -123,8 +127,9 @@ function getCountDaysOnPeriod(/* dateStart, dateEnd */) {
  * '2024-02-02', { start: '2024-02-02', end: '2024-03-02' } => true
  * '2024-02-10', { start: '2024-02-02', end: '2024-03-02' } => true
  */
-function isDateInPeriod(/* date, period */) {
-  throw new Error('Not implemented');
+function isDateInPeriod(date, period) {
+  const [d, s, e] = [date, period.start, period.end].map((i) => new Date(i));
+  return d >= s && d <= e;
 }
 
 /**
@@ -138,8 +143,29 @@ function isDateInPeriod(/* date, period */) {
  * '1999-01-05T02:20:00.000Z' => '1/5/1999, 2:20:00 AM'
  * '2010-12-15T22:59:00.000Z' => '12/15/2010, 10:59:00 PM'
  */
-function formatDate(/* date */) {
-  throw new Error('Not implemented');
+function formatDate(date) {
+  const d = new Date(date);
+  const [mo, da, ye, m, s] = [
+    d.getUTCMonth() + 1,
+    d.getUTCDate(),
+    d.getUTCFullYear(),
+    d.getUTCMinutes(),
+    d.getUTCSeconds(),
+  ];
+  let h = d.getUTCHours();
+  let am;
+  if (h > 12) {
+    am = 'PM';
+    h -= 12;
+  } else if (h > 11) {
+    am = 'PM';
+  } else {
+    am = 'AM';
+  }
+  const t = [h, m, s]
+    .map((i, ind) => (ind !== 0 ? `${i}`.padStart(2, '0') : i))
+    .join(':');
+  return `${mo}/${da}/${ye}, ${t} ${am}`;
 }
 
 /**
